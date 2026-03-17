@@ -31,12 +31,7 @@ Position move(Position current, Direction d) {
 
 
 int main() {
-    Position head = {5,5};
-    cout << head.x << " " << head.y << endl;
-    head = move(head, DOWN);
-    cout << head.x << " " << head.y << endl;
-    head = move(head, RIGHT);
-    cout << head.x << " " << head.y << endl;
+   
 
     return 0;
 }
