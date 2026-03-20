@@ -1,7 +1,7 @@
 # Snake-game
 A group project to create snake in c++.
 
-##Description
+## Description
 This is a project we were assigned to create to improve our ability to coroperate with classmates and work toward a shared goal. This game will allow the user to play snake usinng "awsd" to control direction. There will be an easy setting, which will allow the player to travel through the borders and teleport through the other side, and a hard setting which will kill the player if the snake head comes into contact with the border or snake body. The player's score increases everytime the eat a fruit, and they win when there are no fruits left to eat
 
 
