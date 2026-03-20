@@ -1,0 +1,59 @@
+#include <iostream>
+#include <vector>
+
+                                                  // 1. Global Variables: These live outside so all functions can see them
+
+int width = 20;
+int height = 10;
+int headX, headY;
+
+                                                  // 2. Setup Function: Initializes the game state
+
+void Setup() {
+                                                  // This calculates the center of the grid
+    headX = width / 2;
+    headY = height / 2;
+}
+
+                                                  // 3. Draw Function: Handles all the visual rendering
+
+void Draw() {
+                                                  // This clears the console screen so the map stays in one place
+                                                  // On Mac/Linux we use "clear". (On Windows, you would use "cls")
+    std::system("clear");
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+                                                   // Draw the top/bottom and side walls
+            if (i == 0 || i == height - 1 || j == 0 || j == width - 1) {
+                std::cout << "#";
+            }
+                                                  // Draw the snake head at the center coordinates
+            else if (i == headY && j == headX) {
+                std::cout << "O";
+            }
+                                                  // Fill the rest with empty space
+            else {
+                std::cout << " ";
+            }
+        }
+        std::cout << std::endl; // Move to the next row
+    }
+}
+
+                                                    // 4. Input Function: (Required for modularity, will use in Milestone 2)
+void Input() {
+                                                    // This will eventually handle your keyboard presses (W, A, S, D)
+}
+
+                                                    // 5. Logic Function: (Required for modularity, will use in Milestone 2)
+void Logic() {
+                                                    // This will eventually update the snake's position based on input
+}
+
+                                                    // 6. Main Function: The "Manager" that calls the other functions
+int main() {
+    Setup();
+    Draw();
+    return 0;
+}
