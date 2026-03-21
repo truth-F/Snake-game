@@ -178,7 +178,6 @@ int main(){
 
     srand(time(0));
 
-    //Test DO NOT PRESS INFINITE LOOP
     while (!gameOver) {
         for (int i = 0; i <10; i++) {
             Input(nextDirection);
