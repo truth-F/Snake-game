@@ -1,0 +1,150 @@
+#include <iostream>
+#include <vector>
+#include <thread>
+#include <chrono>
+#include <termios.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+using std::cout;
+using std::endl;
+using std::vector;
+
+// Global Dimensions
+const int width = 22, height = 22;
+
+enum Direction { UP, DOWN, LEFT, RIGHT };
+struct Position { int x, y; };
+
+// --- 1. NON-BLOCKING INPUT --- ( created this logic for Mac-OS)
+void Input(Direction& nextDirection) {
+    struct termios oldt, newt;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    int oldf = fcntl(STDIN_FILENO, F_GETFL, 0);
+    fcntl(STDIN_FILENO, F_SETFL, oldf | O_NONBLOCK);
+
+    ch = getchar();
+
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    fcntl(STDIN_FILENO, F_SETFL, oldf);
+
+    if (ch != EOF) {
+        switch (ch) {
+            case 'w': nextDirection = UP; break;
+            case 's': nextDirection = DOWN; break;
+            case 'a': nextDirection = LEFT; break;
+            case 'd': nextDirection = RIGHT; break;
+        }
+    }
+}
+
+// --- 2. GAME LOGIC (Passing by Reference) ---
+void Logic(vector<Position>& snake, Direction& currentDir, Direction& nextDir, Position& fruit, int& score, bool& gameOver) {
+    // Prevent snake from turning into itself.
+    if (!((currentDir == UP && nextDir == DOWN) || (currentDir == DOWN && nextDir == UP) ||
+          (currentDir == LEFT && nextDir == RIGHT) || (currentDir == RIGHT && nextDir == LEFT))) {
+        currentDir = nextDir;
+    }
+
+    // Calculate new head position
+    Position newHead = snake[0];
+    if (currentDir == UP) newHead.y--;
+    else if (currentDir == DOWN) newHead.y++;
+    else if (currentDir == LEFT) newHead.x--;
+    else if (currentDir == RIGHT) newHead.x++;
+
+    // Wall Collision Check
+    if (newHead.x <= 0 || newHead.x >= width - 1 || newHead.y <= 0 || newHead.y >= height - 1) {
+        gameOver = true;
+        return;
+    }
+
+    // Self-Collision Check (Tail Logic)
+    for (size_t i = 0; i < snake.size(); i++) {
+        if (newHead.x == snake[i].x && newHead.y == snake[i].y) {
+            gameOver = true;
+            return;
+        }
+    }
+
+    // Move the snake (Shift positions)
+    snake.insert(snake.begin(), newHead);
+
+    // Fruit Logic
+    if (newHead.x == fruit.x && newHead.y == fruit.y) {
+        score++;
+        fruit.x = rand() % (width - 2) + 1;
+        fruit.y = rand() % (height - 2) + 1;
+        // Do not pop_back, so snake grows
+    } else {
+        snake.pop_back(); // Shift tail
+    }
+}
+
+// --- 3. DRAW SYSTEM (Nested Loops) ---
+void Draw(const vector<Position>& snake, const Position& fruit, int& score) {
+    cout << "\033[H"; // Reset cursor to top-left
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            // Draw Borders
+            if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
+                cout << "#";
+            }
+            // Draw Fruit // " F " // <<<<<----- SYMBOL FOR FRUIT
+            else if (x == fruit.x && y == fruit.y) {
+                cout << "F";
+            }
+            // Draw Snake
+            else {
+                bool isPart = false;
+                for (size_t i = 0; i < snake.size(); i++) {
+                    if (snake[i].x == x && snake[i].y == y) {
+                        cout << (i == 0 ? "0" : "o"); // Head is 0, tail is 0
+                        isPart = true;
+                        break;
+                    }
+                }
+                if (!isPart) cout << " ";
+            }
+        }
+        cout << endl;
+    }
+    cout << "Fruits Eaten: " << score << "          " << endl;
+}
+
+// --- 4. MAIN ---
+int main() {
+    srand(time(0));
+    system("clear");
+
+    // Requirement: Snake Start at center
+    vector<Position> snake = {{11, 11}};
+   // Fruit Spawn Randomly ?!?!?!?
+    Position fruit;
+    fruit.x = rand() % (width - 2) + 1;
+    fruit.y = rand() % (height - 2) + 1;
+
+    Direction currentDir = RIGHT, nextDir = RIGHT;
+    int score = 0;
+    bool gameOver = false;
+
+    while (!gameOver) {
+        Input(nextDir);
+        // All variables passed by reference (&) for high performance
+        Logic(snake, currentDir, nextDir, fruit, score, gameOver);
+        Draw(snake, fruit, score);
+        std::this_thread::sleep_for(std::chrono::milliseconds(130));
+    }
+
+    cout << "\n==================================" << endl;
+    cout << " GAME OVER! Final Score: " << score << endl;
+    cout << "==================================" << endl;
+
+    return 0;
+}
