@@ -8,13 +8,13 @@ using std::cout;
 using std::endl;
 using std::vector;
 
-int height = 22, width = 22;
 //Basic direction & position
 enum Direction { UP, DOWN, LEFT, RIGHT };
 struct Position {
     int x;
     int y;
 };
+
 
 
 //Is snake turning into itself?
@@ -51,17 +51,17 @@ bool hitSelf(const vector<Position>& snake) {
     return false;
 }
 
-bool hitWall(const Position& head) {
+bool hitWall(const Position& head, int height, int width) {
     return (head.x == 0 || head.x == width-1
         || head.y == 0 || head.y == height-1);
 }
 
 
-Position spawnFruit(const vector<Position>& snake) {
+Position spawnFruit(const vector<Position>& snake, int height, int width) {
     while (true) {
         Position fruit;
-        fruit.x = rand() % width;
-        fruit.y = rand() % height;
+        fruit.x = rand() % (width - 2) + 1;
+        fruit.y = rand() % (height - 2) + 1;
 
         bool available = true;
 
@@ -108,7 +108,7 @@ void updateSnake(vector<Position>& snake, Direction dir, bool grow) {
 
 //Defines rules for snake
 void Logic(vector<Position>& snake, Direction& currentDirection,
-    Direction& nextDirection, Position& fruit, bool& gameOver) {
+    Direction& nextDirection, Position& fruit, int height, int width, int& score, bool& gameOver) {
     if (!isOpposite(currentDirection, nextDirection)) {
         currentDirection = nextDirection;
     }
@@ -117,18 +117,21 @@ void Logic(vector<Position>& snake, Direction& currentDirection,
     updateSnake(snake, currentDirection, ate);
 
     if (ate) {
-        fruit = spawnFruit(snake);
+        score++;
+        fruit = spawnFruit(snake, height, width);
     }
     if (hitSelf(snake)) {
         gameOver = true;
     }
-    if (hitWall(snake[0])) {
+    if (hitWall(snake[0], height, width)) {
         gameOver = true;
     }
 }
 
 //Makes snake appear
-void Draw(const vector<Position>& snake, const Position& fruit) {
+void Draw(const vector<Position>& snake, const Position& fruit,
+            int height, int width, int score, bool gameOver) {
+
     system("cls");
 
     for (int y = 0; y < height; y++) {
@@ -141,7 +144,7 @@ void Draw(const vector<Position>& snake, const Position& fruit) {
 
                 for (size_t i = 0; i < snake.size(); i++) {
                     if (snake[i].x == x && snake[i].y == y) {
-                        cout << (i ==0 ? "S" : "s");
+                        cout << (i == 0 ? "S" : "s");
                         printed = true;
                         break;
                     }
@@ -157,36 +160,60 @@ void Draw(const vector<Position>& snake, const Position& fruit) {
         }
         cout << endl; // Move to the next row
     }
+    cout << "Score: " << score << endl;
+}
 
-    for (const Position& s : snake) {
-        cout << "(" << s.x << "," << s.y << ") ";
-    }
-    cout << endl;
+void DrawGameOver(int height, int width, int score) {
+    COORD coord;
+
+    system("cls");
+
+    int centerX = width / 2;
+    int centerY = height / 2;
+
+    coord.X = 0;
+    coord.Y = centerY - 2;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    cout << endl << " ===== GAME OVER ===== ";
+
+    coord.X = centerX - 8;
+    coord.Y = centerY;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+    cout << "Final Score: " << score << endl
+        << "Press any key to exit...";
+
+    _getch();
+
 }
 
 
 int main(){
+    int height = 12, width = 22;
+
     vector<Position> snake = {
-        {11,11},{10,11},{9,11}
+        {11,5},{10,5},{9,5}
     };
-    Position fruit = {13, 11};
+    Position fruit = {15, 5};
 
     Direction currentDirection = RIGHT;
     Direction nextDirection = RIGHT;
+
+    int delay = 120;
+    int score = 0;
 
     bool gameOver = false;
 
     srand(time(0));
 
+    //Test DO NOT PRESS INFINITE LOOP
     while (!gameOver) {
-        for (int i = 0; i <10; i++) {
-            Input(nextDirection);
-            Logic(snake, currentDirection, nextDirection, fruit, gameOver);
-            Draw(snake,fruit);
-            Sleep(100);
-        }
-        gameOver = true;
+        Input(nextDirection);
+        Logic(snake, currentDirection, nextDirection, fruit, height, width, score, gameOver);
+        Draw(snake, fruit, height, width, score, gameOver);
+        Sleep(delay);
     }
+
+    DrawGameOver(height, width, score);
     return 0;
 
 }
