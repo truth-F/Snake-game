@@ -1,1 +1,31 @@
+Snake Game--(macOS Optimized)
+
+A high-performance, modular Snake game written in C++. This project is specifically designed to run in the **macOS Terminal** using low-level system calls for real-time interactivity without external graphics libraries.
+
+GAME OBJECTIVE-- Eat the Fruit(F symbol) to grow your snake, avoid hitting the walls(the # border) and your own tail (o). 
+---
+GAME FEATURES:
+
+Non-Blocking Input: Unlike standard C++ programs, this game does not pause to wait for the "Enter" key. It listens to your keystrokes in real-time.
+
+Flicker-Free Rendering: Uses ANSI escape sequences (\033[H) to refresh the grid smoothly, avoiding the "waterfall" effect common in terminal games.
+
+Dynamic Growth: The snake body is managed via a std::vector, allowing it to grow infinitely as you eat fruit.
+
+Score Tracking: Real-time "Fruits Eaten" counter displayed at the bottom of the grid.
+
+CONTROLS: 
+
+W: Move Up 
+A: Move Left
+S: Move Down
+D: Move Right
+
+
+
+
+Quick Start: Compile & Run
+
+To build and start the game immediately, paste this single command into your terminal:
+./cmake-build-debug/(This is where your file name goes, put it here and click enter to start the game.)  
 
