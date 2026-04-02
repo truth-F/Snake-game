@@ -37,11 +37,13 @@ Position move(Position snakeCurrent, Direction d) {
     return newPos;
 }
 
+//Confirms if snake head has same position as fruit
 bool snakeEat(const vector<Position>& snake, const Position currentFruit) {
     return((snake[0].x == currentFruit.x) && (snake[0].y == currentFruit.y));
 }
 
 
+//Does snake head come into contact with body?
 bool hitSelf(const vector<Position>& snake) {
     for (size_t i = 1; i < snake.size(); i++) {
         if (snake[0].x == snake[i].x && snake[0].y == snake[i].y) {
@@ -51,12 +53,14 @@ bool hitSelf(const vector<Position>& snake) {
     return false;
 }
 
+//Does snake hit wall?
 bool hitWall(const Position& head, int height, int width) {
     return (head.x == 0 || head.x == width-1
         || head.y == 0 || head.y == height-1);
 }
 
 
+//Returns fruit in random available position
 Position spawnFruit(const vector<Position>& snake, int height, int width) {
     while (true) {
         Position fruit;
@@ -142,16 +146,18 @@ void Draw(const vector<Position>& snake, const Position& fruit,
             }else {
                 bool printed = false;
 
+                // Draw snake
                 for (size_t i = 0; i < snake.size(); i++) {
                     if (snake[i].x == x && snake[i].y == y) {
-                        cout << (i == 0 ? "S" : "s");
+                        cout << (i == 0 ? "0" : "o");
                         printed = true;
                         break;
                     }
                 }
+                // Draw fruit or blank
                 if (!printed) {
                     if (fruit.x == x && fruit.y == y) {
-                        cout << "o";
+                        cout << "F";
                     } else {
                         cout << " ";
                     }
@@ -163,6 +169,7 @@ void Draw(const vector<Position>& snake, const Position& fruit,
     cout << "Score: " << score << endl;
 }
 
+// FIX ME supposed to show game over in middle of screen
 void DrawGameOver(int height, int width, int score) {
     COORD coord;
 
