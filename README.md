@@ -19,7 +19,7 @@ Diego: UI Designer
   Focused on map design. Organized communication between team members.
   Challenges:
 
-Jessie: No role chosen
+Jessie: Converting program into Raylib Library for runnigng program properly.
 
 
 Team Rating:
